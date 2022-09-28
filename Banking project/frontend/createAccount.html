@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Banking Application</title>
+    <link rel="stylesheet" href="styles/bootstrap.min.css" />
+    <link rel="stylesheet" href="styles/styles.css" />
+    <style>
+      input {
+        all: unset;
+        height: 35px;
+      }
+
+      #myForm {
+        padding-top: 250px;
+      }
+      a {
+        pointer-events: all;
+        text-decoration: none;
+      }
+      .registration-link {
+        padding-left: 128px;
+
+        padding-top: 20px;
+      }
+      .inputFields {
+        width: 94%;
+      }
+    </style>
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <div id="myNav"></div>
+    <div class="container">
+      <h2 class="mb-5" style="text-align: center">Create a new Account</h2>
+
+      <div class="row">
+        <div class="col-md-4 offset-md-4 login-form" id="myForm">
+          <form>
+            <div class="form-group mb-3">
+              <label for="amount" class="form-label">Amount</label>
+              <input
+                type="number"
+                class="form-control inputFields"
+                id="amount"
+              />
+
+              <label for="userBranchName" class="form-label">Branch</label>
+              <select class="form-select dropdown" id="branch"></select>
+            </div>
+            <div class="col-md-2 offset-md-5">
+              <button
+                type="button"
+                class="btn btn-success"
+                onclick="createAcc()"
+              >
+                Create
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="filesaver.js"></script>
+    <script>
+      var userId = sessionStorage.getItem("userId");
+      var branch = {};
+      var branches = [];
+      (function () {
+        $("#myNav").load("nav.html");
+        if(userId==null){
+          window.open("404.html","_self");
+        }
+        getBranches();
+      })();
+
+      async function getBranches() {
+        let response = await fetch("http://localhost:5550/bank", {
+          method: "GET",
+        });
+        var data = await response.json();
+
+        myData = data;
+        console.log(myData);
+
+        for (let i = 0; i < myData.length; i++) {
+          branch = {};
+          branch.branchId = myData[i].branchId;
+          branch.branchName = myData[i].branchName;
+          branches.push(branch);
+        }
+
+        appendOptions(branches);
+      }
+      function appendOptions(branches) {
+        console.log(branches);
+        var select = document.getElementById("branch");
+        for (let name of branches) {
+          let option = document.createElement("option");
+          option.value = name.branchId;
+          option.innerText = name.branchName;
+          select.appendChild(option);
+        }
+      }
+
+      function createAcc() {
+        var amount = document.getElementById("amount").value;
+        var branch = document.getElementById("branch").value;
+        if (amount < 2000) {
+          window.alert("Minimum amount should be 2000");
+        } else {
+          createAccApiCall({
+            minimumAmount: 2000,
+            balance: amount,
+            userId: userId,
+            branchId: branch,
+          });
+        }
+        console.log(amount);
+        console.log(branch);
+        window.open("dashboard.html","_self");
+      }
+      async function createAccApiCall(myData) {
+        let response = await fetch("http://localhost:5550/account", {
+          headers: { "Content-type": "application/json" },
+          method: "POST",
+          body: JSON.stringify(myData),
+        });
+
+        let data = await response.json();
+      }
+    </script>
+  </body>
+</html>

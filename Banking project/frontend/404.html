@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rules Engine</title>
+    <link rel="stylesheet" href="styles/bootstrap.min.css" />
+
+    <link rel="stylesheet" href="styles/styles.css" />
+    <style>
+      .not-found {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 80vh;
+      }
+    </style>
+
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"
+    ></script>
+    <script src="js/logout.js"></script>
+  </head>
+
+  <body>
+    <div id="myNav"></div>
+    <div class="container">
+      <div class="not-found">
+        <div class="text-center">
+          <h1 class="display-1 fw-bold">404</h1>
+          <p class="fs-3">
+            <span class="text-danger">Oops!</span> Page not found.
+          </p>
+          <p class="lead">The page you’re looking for doesn’t exist.</p>
+          <a href="index.html" class="btn btn-primary">Login</a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      $("#myNav").load("nav.html");
+      $().ready(function () {
+
+        var myInfo = document.getElementById("info");
+        myInfo.style.display="none";
+        $("#logout")
+          .text("Log In")
+          .attr("onclick", "window.open('index.html','_self')");
+      });
+     
+
+    </script>
+  </body>
+</html>

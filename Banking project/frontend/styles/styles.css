@@ -1,0 +1,112 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400&display=swap');* {
+  font-family: "Open Sans", sans-serif;
+}
+body {
+  background: rgba(224, 222, 222, 0);
+}
+.container {
+  margin-top: 20px;
+  height: 100%;
+}
+.buttons {
+  position: relative;
+  width: 30%;
+  height: 40px;
+  margin-left: 30px;
+  padding-left: 500px;
+}
+input {
+  height: 45px;
+  border: none;
+  border-radius: 0.25em;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+select {
+  border: none;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+.frm {
+  margin: 10px;
+}
+.label {
+  margin: -0.5px;
+}
+.row {
+  width: 100%;
+}
+#xxxx {
+  display: grid;
+  place-content: center;
+  margin-bottom: 50px;
+}
+#save {
+  top: 10px;
+}
+#addMore {
+  top: 10px;
+}
+
+
+.logoutBtn{
+  padding-right: 0;
+}
+
+
+
+.btn {
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+.overflow-auto::-webkit-scrollbar {
+  width: 12px;
+}
+
+.overflow-auto::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+}
+
+.overflow-auto::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
+  background-color: rgb(25, 134, 83, 0.3);
+}
+.offcanvas-start {
+  width: 250px;
+ 
+}
+.dropdown-menu {
+  width: 87%;
+}
+.dropdown-toggle {
+  cursor: pointer;
+}
+
+.btn-primary {
+  background-color: #033685;
+  border-color: #033685;
+}
+.btn-primary:hover {
+  background-color: #033685;
+  border-color: #033685;
+}
+.form-check-input:checked{
+  background-color: #033685;
+  border-color: #033685;
+}
+.form-check-input{
+  cursor: pointer;
+}
+.row > * {
+  padding-right: 0;
+}
+.extra-buttons {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding-right: 5px;
+}
+
+.nav-link{
+  color: white;
+  font-weight: 800;
+}

@@ -1,0 +1,16 @@
+server:
+  port: 5550
+
+spring:
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5Dialect
+    hibernate:
+      naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
+      ddl-auto: update
+    show-sql: 'true'
+  datasource:
+    url: jdbc:mysql://localhost:3306/onlinebankingdb
+    username: root
+    password: password

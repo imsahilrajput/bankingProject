@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Banking Application</title>
+    <link rel="stylesheet" href="styles/bootstrap.min.css" />
+    <link rel="stylesheet" href="styles/styles.css" />
+    <style>
+      input {
+        all: unset;
+        height: 35px;
+      }
+
+      #myForm {
+        padding-top: 250px;
+      }
+      a {
+        pointer-events: all;
+        text-decoration: none;
+      }
+      .registration-link {
+        padding-left: 128px;
+
+        padding-top: 20px;
+      }
+      .inputFields {
+        width: 94%;
+      }
+    </style>
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <div id="myNav"></div>
+    <div class="container">
+      <h2 class="mb-5" style="text-align: center">Select Account And Branch</h2>
+
+      <div class="row">
+        <div class="col-md-4 offset-md-4 login-form" id="myForm">
+          <form>
+            <div class="form-group mb-3">
+              <label for="userBranchName" class="form-label">Branch</label>
+              <select class="form-select dropdown" id="branch"></select>
+
+              <label for="accountNumber" class="form-label"
+                >Account Number</label
+              >
+              <select class="form-select dropdown" id="account"></select>
+            </div>
+            <div class="col-md-2 offset-md-5">
+              <button
+                type="button"
+                class="btn btn-success"
+                onclick="UpdateAcc()"
+              >
+                Update
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="filesaver.js"></script>
+    <script>
+      var userId = sessionStorage.getItem("userId");
+      var branch = {};
+      var branches = [];
+      var account = {};
+      var accounts = [];
+      (function () {
+        $("#myNav").load("nav.html");
+      
+        getBranches();
+        getAllAccountsApiCall();
+      })();
+
+      async function getBranches() {
+        let response = await fetch("http://localhost:5550/bank", {
+          method: "GET",
+        });
+        var data = await response.json();
+
+        myData = data;
+        console.log(myData);
+
+        for (let i = 0; i < myData.length; i++) {
+          branch = {};
+          branch.branchId = myData[i].branchId;
+          branch.branchName = myData[i].branchName;
+          branches.push(branch);
+        }
+
+        appendOptions(branches);
+      }
+      function appendOptions(branches) {
+        console.log(branches);
+        var select = document.getElementById("branch");
+        for (let name of branches) {
+          let option = document.createElement("option");
+          option.value = name.branchId;
+          option.innerText = name.branchName;
+          select.appendChild(option);
+        }
+      }
+
+      async function getAllAccountsApiCall() {
+        let response = await fetch("http://localhost:5550/account/" + userId, {
+          method: "GET",
+        });
+        let myData = await response.json();
+        // console.log(data);
+        for (let i = 0; i < myData.length; i++) {
+          account = {};
+          account.accountNumber = myData[i].accountNumber;
+          account.accountNum = "38610000" + myData[i].accountNumber;
+          accounts.push(account);
+        }
+        appendOptionsOfAcc(accounts);
+      }
+
+      function appendOptionsOfAcc(accounts) {
+        console.log(accounts);
+        var select = document.getElementById("account");
+        for (let name of accounts) {
+          let option = document.createElement("option");
+          option.value = name.accountNumber;
+          option.innerText = name.accountNum;
+          select.appendChild(option);
+        }
+      }
+
+      function UpdateAcc() {
+        var branch = document.getElementById("branch").value;
+        var account = document.getElementById("account").value;
+        data = {
+          accountNumber: account,
+          newBranchId: branch,
+        };
+        UpdateAccApiCall(data);
+      }
+
+      async function UpdateAccApiCall(data) {
+        // console.log(data);
+        let response = await fetch("http://localhost:5550/account", {
+          headers: { "Content-type": "application/json" },
+          method: "PUT",
+          body: JSON.stringify(data),
+        });
+
+        let datas = await response.json();
+
+        window.open("dashboard.html", "_self");
+      }
+    </script>
+  </body>
+</html>

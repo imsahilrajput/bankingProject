@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Banking Application</title>
+    <link rel="stylesheet" href="styles/bootstrap.min.css" />
+
+    <link rel="stylesheet" href="styles/styles.css" />
+    <style>
+      table {
+        border: none;
+        border-collapse: collapse;
+      }
+
+      .dropdown-menu {
+        width: 87%;
+      }
+
+      .dropdown-toggle {
+        cursor: pointer;
+      }
+
+     
+      .form-select{
+        width: 100%;
+        height: 72%;
+      }
+      td,
+      th {
+        height: 60px;
+      }
+      .rule-set-name {
+        text-align: left;
+      }
+      .lastUpdated{
+        text-align: center;
+      }
+      .balance{
+        margin-right: 0px;
+      }
+      .btn{
+        box-shadow: none;
+        height: 50px;
+      }
+      img{
+        height: 40px;
+      }
+    </style>
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"
+    ></script>
+  </head>
+
+  <body onload="myFunction1();">
+    <div id="myNav"></div>
+    <div class="container">
+
+      <div class="row">
+        
+        <br>
+        <br>
+        <br>
+        
+      <h2 class="mb-5" style="text-align: center">Accounts</h2>
+
+     
+
+      <div class="row mt-5" >
+        <div class="col-md-12" id="table">
+          <table class="table border-dark text-center" >
+            <thead>
+              <tr>
+                <th>#</th>
+                <th class="rule-set-name">Account Number</th>
+                <th >Balance</th>
+                <th>Last updated</th>
+              </tr>
+            </thead>
+            <tbody id="inject"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="row" id="notification" style="text-align: center;"><h2>Hii,No Accounts found!! Please Create an Account. </h2></div>
+
+    </div>
+
+    <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
+
+    <script>
+     
+      var userId;
+      var iter=0;
+      var branch={};
+      var branches =[];
+      async function getAllAccountsApiCall() {
+        let response = await fetch(
+          "http://localhost:5550/account/" + userId,
+          {
+            method: "GET",
+          }
+        );
+        let data = await response.json();
+        console.log(data);
+        if(data.length>0){
+          document.getElementById("table").style.display="block";
+          document.getElementById("notification").style.display="none";
+
+          data.forEach(createTable);
+        }else{
+          document.getElementById("table").style.display="none";
+        }
+        
+      }
+
+      function myFunction1() {
+        $("#myNav").load("nav.html");
+        userId = sessionStorage.getItem("userId");
+        if(userId == null){
+          window.open("404.html","_self");
+        }
+        console.log(userId);
+        getAllAccountsApiCall();
+        
+        
+      }
+
+    
+
+
+      function createTable(item) {
+        var accountNumber = item.accountNumber;
+        var branchId=item.branchId;
+        let realAccountNumber= "38610000"+accountNumber.toString();
+        var balance = item.balance;
+        var lastUpdatedOn = item.lastUpdated;
+        addMore(realAccountNumber, balance, lastUpdatedOn);
+      }
+      function addMore(accountNumber, balance, lastUpdatedOn) {
+        var table = document.getElementById("inject");
+        var tableRow = document.createElement("tr");
+        var td0 = document.createElement("th");
+        td0.textContent = iter + 1;
+
+        var td1 = document.createElement("td");
+        td1.setAttribute("hidden", "");
+        td1.setAttribute("id", `accountNumber[${iter}]`);
+        var td2 = document.createElement("td");
+        td2.setAttribute("id", `accountNumber[${iter}]`);
+        td2.classList.add("rule-set-name");
+        var td3 = document.createElement("td");
+        var viewButton=document.createElement("button");
+        viewButton.setAttribute("id", `viewButton[${iter}]`);
+        viewButton.style.display="block";
+        viewButton.classList.add("btn");
+        viewButton.innerHTML='<img src="view.jpg" />';
+        viewButton.setAttribute("onclick",`showBalance(${iter})`)
+        viewButton.classList.add("col-md-6","offset-md-3")
+
+
+        var viewBalance=document.createElement("button");
+        viewBalance.setAttribute("id", `viewBalance[${iter}]`);
+        viewBalance.style.display="none";
+        viewBalance.classList.add("btn");
+        viewBalance.innerHTML=balance;
+        viewBalance.setAttribute("onclick",`hideBalance(${iter})`);
+        viewBalance.classList.add("col-md-6","offset-md-3")
+
+
+        
+        td3.appendChild(viewButton);
+        td3.appendChild(viewBalance);
+        td3.setAttribute("id", `balance[${iter}]`);
+        td3.classList.add("balance");
+        var td6 = document.createElement("td");
+
+        td1.innerHTML = accountNumber;
+        td2.innerHTML = accountNumber;
+        // td3.innerHTML=balance
+
+       
+
+        td6.innerHTML = lastUpdatedOn;
+        td6.setAttribute("id", `lastUpdatedOn[${iter}]`);
+        td6.classList.add("lastUpdated");
+        tableRow.append(td0, td1, td2, td3,td6);
+        table.appendChild(tableRow);
+        iter++;
+      }
+
+      function showBalance(id){
+        var button = document.getElementById(`viewButton[${id}]`);
+        var balance = document.getElementById(`viewBalance[${id}]`);
+
+        button.style.display="none";
+        balance.style.display="block";
+      }
+      function hideBalance(id){
+        var button = document.getElementById(`viewButton[${id}]`);
+        var balance = document.getElementById(`viewBalance[${id}]`);
+
+        button.style.display="block";
+        balance.style.display="none";
+      }
+      
+     
+
+
+    </script>
+  </body>
+</html>

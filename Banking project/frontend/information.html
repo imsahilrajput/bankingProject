@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Banking Application</title>
+    <link rel="stylesheet" href="styles/bootstrap.min.css" />
+    <link rel="stylesheet" href="styles/styles.css" />
+    <style>
+      input {
+        all: unset;
+        height: 35px;
+      }
+      a {
+        pointer-events: none;
+      }
+      #myForm {
+        padding-top: 100px;
+      }
+      a {
+        pointer-events: all;
+        text-decoration: none;
+      }
+      .registration-link {
+        padding-top: 20px;
+        padding-left: 206px;
+      }
+      .navbar-dark .navbar-nav .nav-link {
+        color: white;
+      }
+    </style>
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <div id="myNav"></div>
+    <div class="container">
+      <h2 class="mb-5" style="text-align: center">My Information</h2>
+
+      <div class="row">
+        <div class="col-md-6 offset-md-3 registration-form" style="padding-top:0px ;" id="myForm">
+          <form>
+            <div class="form-group mb-3">
+              <label for="firstName" class="form-label">First Name</label>
+              <input
+                type="text"
+                class="form-control"
+                id="firstName"
+                data-firstName
+              />
+              <label for="lastName" class="form-label">Last Name</label>
+              <input
+                type="text"
+                class="form-control"
+                id="lastName"
+                data-lastName
+              />
+              <label for="username" class="form-label">Username</label>
+              <input
+                type="text"
+                class="form-control"
+                id="username"
+                data-username
+              />
+              <label for="emailId" class="form-label">Email id</label>
+              <input
+                type="text"
+                class="form-control"
+                id="emailId"
+                data-emailId
+              />
+              <label for="password" class="form-label">Password</label>
+              <input
+                type="password"
+                class="form-control"
+                id="password"
+                minlength="6"
+                data-password
+              />
+              <label for="address" class="form-label">Address</label>
+              <input
+                type="text"
+                class="form-control"
+                id="address"
+                data-address
+              />
+
+              <label for="phoneNumber" class="form-label">Phone Number</label>
+              <input
+                type="text"
+                class="form-control"
+                id="phone"
+                minlength="10"
+                data-Phone
+              />
+              <label for="dob" class="form-label">Date of Birth</label>
+              <input
+                type="date"
+                class="form-control"
+                id="dob"
+                minlength="10"
+                data-dob
+              />
+              <label for="phoneNumber" class="form-label">Cibil Score</label>
+              <input
+                type="text"
+                class="form-control"
+                id="cibil"
+                minlength="10"
+                data-cibil
+              />
+              <label for="phoneNumber" class="form-label">Monthly Salary</label>
+              <input
+                type="text"
+                class="form-control"
+                id="alary"
+                minlength="10"
+                data-salary
+              />
+            </div>
+            <div class="col-md-2 offset-md-5">
+              <button type="button" class="btn btn-success" onclick="update()">
+                Update
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="filesaver.js"></script>
+    <script>
+      var userId = sessionStorage.getItem("userId");
+      var accounts = [];
+      (function () {
+        $("#myNav").load("nav.html");
+        if(userId==null){
+          window.open("404.html","_self");
+        }
+        getUserInfoApiCall(userId);
+      })();
+
+      async function getUserInfoApiCall(userId) {
+        let response = await fetch("http://localhost:5550/user/" + userId, {
+          method: "GET",
+        });
+        let data = await response.json();
+        console.log(data);
+
+        document.querySelector("[data-firstName]").value = data.firstName;
+        document.querySelector("[data-lastName]").value = data.lastName;
+        document.querySelector("[data-username]").value = data.lastName;
+
+        document.querySelector("[data-password]").value = data.lastName;
+
+        document.querySelector("[data-address]").value = data.address;
+        document.querySelector("[data-phone]").value = data.phoneNumber;
+        document.querySelector("[data-emailId]").value = data.email;
+        document.querySelector("[data-dob]").value = data.dob.slice(0,10);
+        document.querySelector("[data-cibil]").value = data.cibilScore;
+        document.querySelector("[data-salary]").value = data.monthlySalary;
+
+      }
+      function update() {
+        const firstName = document.querySelector("[data-firstName]").value;
+        const lastName = document.querySelector("[data-lastName]").value;
+        const address = document.querySelector("[data-address]").value;
+        const phoneNumber = document.querySelector("[data-phone]").value;
+        const emailId = document.querySelector("[data-emailId]").value;
+
+        const username = document.querySelector("[data-username]").value;
+        const password = document.querySelector("[data-password]").value;
+        const dob = document.querySelector("[data-dob]").value;
+        const cibilScore = document.querySelector("[data-cibil]").value;
+        const monthlySalary = document.querySelector("[data-salary]").value;
+
+        const credentials = {
+          userId: userId,
+          userName: username,
+          firstName: firstName,
+          lastName: lastName,
+          password: password,
+          address: address,
+          email: emailId,
+          phoneNumber: phoneNumber,
+          dob:dob,
+          cibilScore:cibilScore,
+          monthlySalary:monthlySalary
+        };
+
+        console.log(credentials);
+        updateApiCall(credentials);
+      }
+
+      async function updateApiCall(data) {
+        // console.log(data);
+        let response = await fetch("http://localhost:5550/user", {
+          headers: { "Content-type": "application/json" },
+          method: "PUT",
+          body: JSON.stringify(data),
+        });
+
+        let datas = await response.json();
+        console.log(datas.message);
+
+        if (datas.message == "Successful") {
+          //   sessionStorage.setItem("userId",datas.userId);
+          window.alert("User Updated Successfuly.");
+        }
+        window.open("information.html", "_self");
+      }
+    </script>
+  </body>
+</html>

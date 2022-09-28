@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Banking Application</title>
+    <link rel="stylesheet" href="styles/bootstrap.min.css" />
+    <link rel="stylesheet" href="styles/styles.css" />
+    <style>
+      .dropdown {
+        width: 25%;
+        margin-right: 10px;
+      }
+
+      .form-group {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .header {
+        font-weight: bold;
+        font-size: larger;
+      }
+      .transactions {
+        font-style: italic;
+      }
+
+      .downloadBtn {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        /* margin-left: 500px; */
+        margin-top: 10px;
+      }
+      #downloadBtn {
+        display: none;
+      }
+    </style>
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <div id="myNav"></div>
+    <div class="container">
+      <h2 class="mb-5" style="text-align: center">Transactions</h2>
+
+      <div class="row">
+       
+        <div class="col-md-6 form-group offset-md-3">
+          <select class="form-select dropdown" id="dropdown">
+            <option value="all">All</option>
+          </select>
+          <button class="btn btn-success" onclick="loadTransactions()">
+            Get Transactions
+          </button>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12 downloadBtn">
+          <button
+            class="btn btn-outline-primary"
+            id="downloadBtn"
+            onclick="download()"
+          >
+            Download
+          </button>
+        </div>
+      </div>
+      <hr />
+      <div class="row">
+        <div class="col-xs-12">
+          <div id="inject"></div>
+        </div>
+      </div>
+    </div>
+    <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="filesaver.js"></script>
+    <script>
+      var userId = sessionStorage.getItem("userId");
+      var accounts = [];
+      (function () {
+        $("#myNav").load("nav.html");
+        if(userId==null){
+          window.open("404.html","_self");
+        }
+        getAccounts(userId);
+      })();
+
+      function appendOptions() {
+        var select = document.getElementById("dropdown");
+        for (let name of accounts) {
+          let option = document.createElement("option");
+          option.value = name;
+          option.innerText = "38610000" + name;
+          select.appendChild(option);
+        }
+      }
+      function loadTransactions() {
+        document.getElementById("downloadBtn").style.display = "block";      
+
+        var dropdownValue = document.getElementById("dropdown").value;
+
+        if (dropdownValue == "all") {
+            showTransactionsOfAllAccountsApiCall(userId);
+          } else {
+            showTransactionsApiCall(dropdownValue);
+          }
+      
+      }
+      var myData;
+
+      async function showTransactionsApiCall(accountNumber) {
+        let response = await fetch(
+          `http://localhost:5550/transaction/${accountNumber}`,
+          {
+            method: "GET",
+          }
+        );
+        var data = await response.json();
+        myData = data;
+        console.log(data);
+
+        if (data.length == 0) {
+          alert("No Transactions Found !!");
+          window.open("showTransactions.html", "_self");
+        } else {
+          let html = `<div class="row header">
+            <div class="col-md-2">Transaction ID</div>
+            <div class="col-md-2">Amount</div>
+            <div class="col-md-3">Mode</div>
+            <div class="col-md-3">Type</div>
+            <div class="col-md-2">Date</div>
+          </div><hr>`;
+          document.getElementById("inject").innerHTML = html;
+          data.forEach((item) => {
+            console.log(item.transfer);
+            const transId = item.transactionId;
+            const amount = item.amount;
+            const mode = item.transactionType;
+            var type = "";
+            if (
+              item.transfer === true &&
+              item.withdraw === false &&
+              item.deposit === false
+            ) {
+              console.log("transfer");
+              type = "Transfer";
+            } else if (
+              item.transfer === false &&
+              item.withdraw === false &&
+              item.deposit === true
+            ) {
+              type = "Deposit";
+              console.log("deposit");
+            } else {
+              console.log("Withdraw");
+              type = "Withdraw";
+            }
+
+            const date = item.date;
+
+            var html = `<div class="row transactions">
+          <div class="col-md-2">${transId}</div>
+          <div class="col-md-2">${amount}</div>
+          <div class="col-md-3 overflow-auto">${mode}</div>
+          <div class="col-md-3 overflow-auto">${type}</div>
+          <div class="col-md-2">${date}</div>
+        </div><hr>`;
+            document.getElementById("inject").innerHTML += html;
+          });
+        }
+      }
+
+      async function getAccounts(userId) {
+        let response = await fetch(`http://localhost:5550/account/${userId}`, {
+          method: "GET",
+        });
+        var data = await response.json();
+
+        myData = data;
+        console.log(myData.length);
+        for (let i = 0; i < myData.length; i++) {
+          accounts.push(myData[i].accountNumber);
+        }
+
+        appendOptions();
+      }
+
+      async function showTransactionsOfAllAccountsApiCall(userId) {
+        let response = await fetch(
+          `http://localhost:5550/transaction/user/${userId}`,
+          {
+            method: "GET",
+          }
+        );
+        var data = await response.json();
+        myData = data;
+        console.log(data);
+        if (data.length == 0) {
+          alert("No Transactions Found !!");
+          window.open("showTransactions.html", "_self");
+        } else {
+          let html = `<div class="row header">
+            <div class="col-md-2">Transaction ID</div>
+            <div class="col-md-2">Amount</div>
+            <div class="col-md-3">Mode</div>
+            <div class="col-md-3">Type</div>
+            <div class="col-md-2">Date</div>
+          </div><hr>`;
+          document.getElementById("inject").innerHTML = html;
+          data.forEach((item) => {
+            console.log(item.transfer);
+            const transId = item.transactionId;
+            const amount = item.amount;
+            const mode = item.transactionType;
+            var type = "";
+            if (
+              item.transfer === true &&
+              item.withdraw === false &&
+              item.deposit === false
+            ) {
+              console.log("transfer");
+              type = "Transfer";
+            } else if (
+              item.transfer === false &&
+              item.withdraw === false &&
+              item.deposit === true
+            ) {
+              type = "Deposit";
+              console.log("deposit");
+            } else {
+              console.log("Withdraw");
+              type = "Withdraw";
+            }
+
+            const date = item.date;
+
+            var html = `<div class="row transactions">
+          <div class="col-md-2">${transId}</div>
+          <div class="col-md-2">${amount}</div>
+          <div class="col-md-3 overflow-auto">${mode}</div>
+          <div class="col-md-3 overflow-auto">${type}</div>
+          <div class="col-md-2">${date}</div>
+        </div><hr>`;
+            document.getElementById("inject").innerHTML += html;
+          });
+        }
+      }
+
+      const EXCEL_TYPE =
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
+      const EXCEL_EXTENSION = ".xlsx";
+      function download() {
+        const worksheet = XLSX.utils.json_to_sheet(myData);
+        const workbook = {
+          Sheets: {
+            myData: worksheet,
+          },
+          SheetNames: ["myData"],
+        };
+        const excelBuffer = XLSX.write(workbook, {
+          bookType: "xlsx",
+          type: "array",
+        });
+        saveAsExcel(excelBuffer, "transactions");
+      }
+
+      function saveAsExcel(buffer, filename) {
+        const myData = new Blob([buffer], { type: EXCEL_TYPE });
+        saveAs(
+          myData,
+          filename + "_export_" + new Date().getTime() + EXCEL_EXTENSION
+        );
+      }
+    </script>
+  </body>
+</html>
