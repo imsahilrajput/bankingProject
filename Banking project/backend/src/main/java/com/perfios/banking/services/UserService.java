@@ -34,10 +34,10 @@ public class UserService {
 
         User user = new User(userDTO.getUserName(), userDTO.getFirstName(), userDTO.getLastName(), userDTO.getPassword(), userDTO.getAddress(), userDTO.getEmail(), userDTO.getPhoneNumber(),userDTO.getRole(),userDTO.getDob(),userDTO.getCibilScore(),userDTO.getMonthlySalary(),fileName, file.getContentType(), file.getBytes());
 
-         userRepository.save(user);
+         User user1 = userRepository.saveAndFlush(user);
          UserDTOResponse userDTOResponse = new UserDTOResponse();
          userDTOResponse.setMessage("Successful");
-         userDTOResponse.setUser(user);
+         userDTOResponse.setUser(user1);
 
          return userDTOResponse;
 

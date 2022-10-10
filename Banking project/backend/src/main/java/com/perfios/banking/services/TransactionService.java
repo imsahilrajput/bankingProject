@@ -69,7 +69,7 @@ public class TransactionService {
         return transactionResponseDTO;
     }
 
-    public void withdraw(WithdrawDTO withdrawDTO) {
+    public Transactions withdraw(WithdrawDTO withdrawDTO) {
         Double balance = accountRepository.findById(withdrawDTO.getDebit()).get().getBalance();
         if (balance < withdrawDTO.getAmount()) {
             throw new IllegalStateException("Low Balance");
@@ -81,7 +81,7 @@ public class TransactionService {
         accountRepository.save(account);
 
         Transactions transactions = new Transactions("ATM Withdrawl", withdrawDTO.getAmount(), account, new Date());
-        transactionRepository.save(transactions);
+        return transactionRepository.save(transactions);
 
 
     }
